@@ -1,0 +1,58 @@
+echo "# lab1_gomez_almeida" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/VirtualZen/lab1_gomez_almeida.git
+git push -u origin main
+
+
+cd /.../Lab01/lab-semana1
+export UV_CACHE_DIR=/tmp/uv-cache   # optional if your uv cache is blocked
+uv run python _check_clean.py
+
+
+mkdir -p ~/work/lab1-analysis
+cd ~/work/lab1-analysis
+git clone https://github.com/VirtualZen/lab1_gomez_almeida.git .
+# use the feature branch (if it exists) or create it locally
+git fetch origin
+git checkout feature/analisis || git checkout -b feature/analisis
+# set local commit identity for this clone only
+git config user.name "USFQ_apgomez"
+git config user.email "apgomez@estud.usfq.edu.ec"
+# now edit, commit, and push (you will be asked credentials for the GitHub account used by the remote URL)
+git add .
+git commit -m "Work as other user"
+git push --set-upstream origin feature/analisis
+
+# from repo root
+cd /Users/paulehmig/Documents/Personal/USFQ/MaestriaDataScience/Materias/MSDS\ 6005\ Matematicas\ y\ Programacion\ IA/VSWorkspace/Lab01/lab1_gomez_almeida_main
+
+# recommended: uv with temporary cache and PYTHONPATH
+tmpdir=$(mktemp -d /tmp/uv-cache-XXXXX) && export UV_CACHE_DIR="$tmpdir" && PYTHONPATH=src uv run pytest -q tests/test_analisis.py
+
+# alternative: use the active virtualenv
+tmpdir=$(mktemp -d /tmp/uv-cache-XXXXX) && export UV_CACHE_DIR="$tmpdir" && PYTHONPATH=src uv run --active pytest -q tests/test_analisis.py
+
+
+uv run pytest -v
+uvx ruff check .
+
+uv run pytest -q -s tests/test_check_clean.py::test_counts
+
+uv run pytest -q tests/test_analisis_AI.py
+
+cd "/Users/paulehmig/Documents/Personal/USFQ/MaestriaDataScience/Materias/MSDS 6005 Matematicas y Programacion IA/VSWorkspace/Lab01/lab1_gomez_almeida_main"
+
+# Recommended (use active venv to avoid VIRTUAL_ENV mismatch):
+tmpdir=$(mktemp -d /tmp/uv-cache-XXXXX) && export UV_CACHE_DIR="$tmpdir" && PYTHONPATH=src uv run --active pytest -v tests/test_analisis_AI.py
+
+# Alternative (no --active):
+tmpdir=$(mktemp -d /tmp/uv-cache-XXXXX) && export UV_CACHE_DIR="$tmpdir" && PYTHONPATH=src uv run pytest -v tests/test_analisis_AI.py
+
+
+Se entrega al final:
+el link del repositorio público y cuatro capturas de pantalla: (1) los dos Pull Requests mergeados, (2) el conflicto de
+merge antes de resolverlo, (3) uv run pytest en verde, (4) git log --oneline --graph --all.
+

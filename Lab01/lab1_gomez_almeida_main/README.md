@@ -1,0 +1,88 @@
+# Lab Semana 1 - Communities and Crime
+
+- Persona A: Paul Gomez Ehmig
+- Persona B: Ronnie Almeida
+- Dataset: https://archive.ics.uci.edu/static/public/183/data.csv
+- Tarea: regresión
+  Variable objetivo predicción: ViolentCrimesPerPop
+- Descripción: Comunidades de EE.UU. los datos combinan información socioeconómica del censo de 1990, datos policiales de la encuesta LEMAS de 1990 y datos de crimen de la UCR del FBI de 1995. (fuente: https://archive.ics.uci.edu/dataset/183/communities+and+crime)
+- Motivo: Elegimos este dataset porque combina variables socioeconómicas y demográficas con tasas de criminalidad, y tiene ~39000 faltantes repartidos en 25 columnas de diferentes tipos, lo que da material real para practicar la limpieza.
+
+## Como correr
+uv sync
+uv run pytest -q
+uv run pytest -v
+uv run python main.py
+
+## Como correr diagnostico datos
+uv run pytest -q tests/test_carga.py
+uv run pytest -v tests/test_carga.py
+
+## Correr prueba alterna
+tmpdir=$(mktemp -d /tmp/uv-cache-XXXXX) && export UV_CACHE_DIR="$tmpdir" && PYTHONPATH=src uv run --active pytest -v tests/test_analisis.py
+
+## Hallazgos
+- (A) Aproximadamente 21 columnas fueron eliminadas por tener más del 80% de valores faltantes (de 128 columnas originales a 107), sin encontrarse filas duplicadas relevantes en el dataset original.
+- (B) La tasa de crimen violento (ViolentCrimesPerPop) muestra una correlación clara con el porcentaje de población bajo la línea de pobreza (PctPopUnderPov).
+- (B) La tasa de crimen violento (ViolentCrimesPerPop) muestra una correlación clara con el porcentaje
+de población bajo la línea de pobreza (PctPopUnderPov): la recta de mínimos cuadrados ajustada tiene
+pendiente=0.5322 e intercepto=0.0767, es decir, por cada punto porcentual adicional de población bajo
+la línea de pobreza, la tasa de crimen violento normalizada aumenta en promedio 0.53 unidades.
+- (B) Al agrupar las comunidades por cuartiles de población (resumen_por_grupo), se observa una
+tendencia creciente: el cuartil de mayor población (Q4) tiene la media más alta de crimen violento
+(0.371) y también la mayor dispersión (std=0.266), casi el doble que el cuartil de menor población
+(Q1: media=0.170, std=0.184). Esto sugiere que las comunidades más grandes no solo tienden a tener
+más crimen violento en promedio, sino también mayor variabilidad entre ellas.
+- (B) Las 5 comunidades con mayor ViolentCrimesPerPop (top_k) alcanzan el valor máximo normalizado
+(1.0) y la mayoría pertenece al cuartil de mayor población (Q4), lo cual es consistente con el
+hallazgo anterior: el tamaño poblacional se asocia con mayor riesgo de crimen violento extremo,
+aunque no es el único factor (una de las cinco, eastchicagocity, está en Q3).
+
+### Detalle de limpieza (A)
+- before rows,cols: (1994, 128)
+- before total NaNs: 39202
+- before duplicates: 0
+- after rows,cols: (1994, 107)
+- after total NaNs: 2351
+- removed rows: 0
+- removed cols: 21
+
+Entre las columnas con más nulos están PolicReqPerOffic, PolicAveOTWorked, PolicPerPop, RacialMatchCommPol, entre otras. La limpieza conservadora conserva la mayoría de las variables útiles y añade indicadores de faltantes para las columnas imputadas.
+
+## Decisiones de limpieza
+Umbrales configurables en la función limpiar():
+drop_thresh (por defecto 0.8): eliminar columnas con >80% de valores faltantes.
+impute_threshold (por defecto 0.05): solo imputar columnas con ≤5% de faltantes (estrategia conservadora).
+Imputación:
+Variables numéricas con 0 < missing ≤ impute_threshold: se imputan con la mediana y se añade la columna indicadora <nombre>_was_missing.
+Variables categóricas con 0 < missing ≤ impute_threshold: se imputan con la moda y se añade <nombre>_was_missing.
+Variables categóricas con missing > impute_threshold: se rellena con el sentinel "missing" y se añade el indicador <nombre>_was_missing.
+Registro y reproducibilidad:
+limpiar(..., return_report=True) devuelve un report con listas dropped_columns, imputed_numeric, imputed_categorical y recuentos de filas (antes/después). Guardar este report junto a los artefactos del pipeline para trazabilidad.
+Razonamiento: la política prioriza conservar columnas estables y evitar introducir sesgo por imputaciones agresivas; los indicadores de faltantes preservan la señal útil para modelos que explotan patrones de missingness.
+Cómo ajustar: para conservar más columnas cambiar impute_threshold a valores mayores (ej. 0.2), o para ser más agresivo reducir drop_thresh.
+
+## Pregunta 1
+¿por qué uv sync puede reconstruir el entorno aunque .venv/ no esté versionado en el repositorio? ¿Qué archivo se
+lo permite y qué guarda exactamente ese archivo? Dos líneas bastan.
+
+uv.lock contiene información de runtime, dependencias y paquetes requeridos
+uv sync puede reconstruir el entorno porque uv.lock sí está versionado en el repositorio
+y guarda las versiones exactas (con hash) de cada dependencia resuelta a partir de pyproject.toml,
+así que uv solo necesita descargarlas e instalarlas para recrear .venv/ de forma idéntica.
+muestra:
+version = 1
+revision = 3
+requires-python = ">=3.14"
+ ...
+[[package]]
+name = "numpy"
+version = "2.5.2"
+
+## Pregunta 2
+¿qué diferencia hay entre correr pytest a secas y uv run pytest? Pista: tiene que ver con cuál Python y cuál
+entorno terminan ejecutando las pruebas, y con qué pasa si alguien no activó el entorno virtual.
+
+pytest a secas ejecuta el comando pytest que esté en el PATH de la sesión de shell: es decir, usa el intérprete de Python y las dependencias del entorno actualmente activado (por ejemplo, la venv si la activaste). Si no has activado la venv, pytest puede ejecutarse con el Python del sistema y fallar por import errors o por versiones distintas de paquetes.
+uv run pytest ejecuta pytest dentro del entorno que gestiona uv según la configuración del proyecto (archivo uv.lock / pyproject.toml). uv crea/usa un entorno reproducible con la versión de Python y las dependencias declaradas, por lo que las pruebas se ejecutan en el mismo intérprete/paquetes en cualquier máquina que use uv, aún si el usuario no activó manualmente la venv.
+Consecuencia práctica: si alguien no activó el entorno virtual y ejecuta pytest directamente puede obtener errores tipo ModuleNotFoundError o diferencias por versiones. Con uv run pytest esas discrepancias se evitan porque uv controla cuál Python y qué paquetes se usan.

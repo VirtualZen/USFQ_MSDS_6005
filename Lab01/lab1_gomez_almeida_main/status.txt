@@ -1,0 +1,27 @@
+Repository: https://github.com/VirtualZen/USFQ_MSDS_6005_lab1_gomez_almeida.git
+Comparison baseline: main (9644502)
+Branch status is relative to main. "Behind" and "ahead" are commit counts.
+
+main - 9644502
+  Current baseline; includes the merged carga-limpieza and analisis work.
+
+feature/analisis - 0c9afe3
+  3 commits behind main; 0 commits ahead. No branch-only changes remain.
+  Tip: docs: interpreta resultados de resumen_por_grupo, top_k y regresion en hallazgos
+
+feature/carga-limpieza - d5ded1f
+  12 commits behind main; 0 commits ahead. No branch-only changes remain.
+  Tip: feat: se coloca llamada a approx para el test_carga.py
+
+feature/analisis_AI - 9c25b20
+  24 commits behind main; 3 commits ahead. This branch has changes not in main:
+  Commits:
+    9c25b20 feat: fix module name and init.
+    d3a158a feat: prueba con analisis ficticio generado con AI
+    26938d9 feat: cambio de nombres en análisis alterno generado por AI
+  Changed files relative to main:
+    Modified: README.md
+    Modified: src/lab_semana1/__init__.py
+    Added: src/lab_semana1/analisis_AI.py
+    Added: tests/test_analisis_AI.py
+  Diff: 127 insertions, 2 deletions.

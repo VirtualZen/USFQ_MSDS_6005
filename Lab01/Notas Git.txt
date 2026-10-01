@@ -1,0 +1,76 @@
+git config --global user.name “Paul Ehmig”
+git config --global user.email “paulehmig@gmail.com"
+
+
+cd "/Users/paulehmig/Documents/Personal/USFQ/MaestriaDataScience/Materias"
+
+git config user.name "Paul Gomez Ehmig"
+git config user.email "apgomez@estud.usfq.edu.ec"
+
+git config --global --add 'includeIf.gitdir:/Users/paulehmig/Documents/Personal/USFQ/MaestriaDataScience/Materias/.path' ~/.gitconfig-usfq
+
+git config --file ~/.gitconfig-usfq user.name "Paul Gomez Ehmig"
+git config --file ~/.gitconfig-usfq user.email "apgomez@estud.usfq.edu.ec"
+
+
+cd mi_proyecto
+git remote add origin https://github.com/VirtualZen/USFQ_MSDS_6005_s1.git
+git push -u origin main
+
+# list files on the remote branch
+git ls-tree -r origin/estadistica --name-only
+
+# show the file from the remote branch (if present)
+git show origin/estadistica:src/mi_proyecto/estadistica.py
+
+
+https://learngitbranching.js.org
+
+
+
+git rebase main bugFix
+git rebase bugFix side
+git rebase side another
+git rebase another main
+
+
+git branch -f main o/main
+git checkout -b feature C2
+git push origin feature
+
+git fetch
+git rebase o/main side1
+git rebase side1 side2
+git rebase side2 side3
+git rebase side3 main
+
+
+git checkout main
+git pull
+git merge side1
+git merge side2
+git merge side3
+git push
+
+git checkout -b side o/main
+git commit
+git pull --rebase
+git push
+
+git push origin main
+git push origin foo
+
+git push origin main^:foo
+git push origin foo:main
+
+git fetch origin c3:foo
+git fetch origin c6:main
+git checkout foo
+git merge main
+
+git pull origin c3:foo
+git pull origin c2:side
+
+
+
+git remote add origin https://github.com/<usuarioA>/lab-semana1.git

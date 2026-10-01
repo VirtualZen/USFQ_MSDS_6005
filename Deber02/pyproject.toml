@@ -1,0 +1,24 @@
+[project]
+name = "deber02"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Paul Gomez Ehmig", email = "apgomez@estud.usfq.edu.ec" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "graphviz>=0.21",
+    "ipykernel>=7.3.0",
+    "jupyter>=1.1.1",
+    "matplotlib>=3.11.2",
+    "numpy>=2.5.3",
+    "torch>=2.14.0",
+]
+
+[project.scripts]
+deber02 = "deber02:main"
+
+[build-system]
+requires = ["uv_build>=0.12.10,<0.13.0"]
+build-backend = "uv_build"

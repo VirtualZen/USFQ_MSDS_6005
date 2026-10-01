@@ -1,0 +1,70 @@
+from sklearn import preprocessing
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+
+varianza = [0.99, 0.75, 0.3]
+num_compo_k = []
+
+for x in varianza:
+    # pca.fit calcula los componentes principales. 
+    # Al pasar un float (x), PCA selecciona el número de componentes (k) 
+    # necesarios para retener ese porcentaje de varianza.
+    pca = PCA(x) 
+    pca.fit(X) 
+    num_compo_k.append(pca.n_components_)
+
+# Generar gráfica clara y bien etiquetada para análisis
+plt.figure(figsize=(10, 5))
+plt.title('Varianza Retenida vs Número de Componentes (k)')
+plt.plot(num_compo_k, varianza, marker='o', linestyle='-', color='b')
+plt.xlabel('Número de Componentes (k)')
+plt.ylabel('Varianza Retenida')
+plt.grid(True)
+plt.show()
+
+Análisis 5.1: Existe una relación no lineal entre la varianza retenida y el número de componentes (‭$k$‬). Para alcanzar niveles de varianza muy altos (ej., 99%), el número de componentes requeridos aumenta drásticamente. Elegir un ‭$k$‬ óptimo depende del balance deseado: un nivel del 75% o superior suele ser suficiente para reducir la dimensionalidad significativamente manteniendo la estructura general de los datos, justificando así la pérdida marginal de información exacta.
+
+
+from PIL import Image
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+
+# 1. Cargar imagen y convertir a escala de grises
+img = Image.open("IMG_9576.jpeg")
+img_gray = img.convert("L")  
+img_resized = img_gray.resize((512, 512), Image.LANCZOS)
+img_array = np.array(img_resized, dtype=float)        
+
+# 2. Aplicar PCA para compresión (Proyección en el espacio PCA)
+pca_70 = PCA(0.70)
+img_transformed_70 = pca_70.fit_transform(img_array)
+
+pca_99 = PCA(0.99)
+img_transformed_99 = pca_99.fit_transform(img_array)
+
+# 3. Reconstrucción correcta desde el espacio comprimido
+img_reconstructed_70 = pca_70.inverse_transform(img_transformed_70)
+img_reconstructed_99 = pca_99.inverse_transform(img_transformed_99)
+
+# 4. Visualización para comparación clara
+plt.figure(figsize=(15, 5))
+plt.subplot(1, 3, 1)
+plt.title("Original (512x512)")
+plt.imshow(img_array, cmap='gray')
+
+plt.subplot(1, 3, 2)
+plt.title(f"70% Varianza (k={pca_70.n_components_})")
+plt.imshow(img_reconstructed_70, cmap='gray')
+
+plt.subplot(1, 3, 3)
+plt.title(f"99% Varianza (k={pca_99.n_components_})")
+plt.imshow(img_reconstructed_99, cmap='gray')
+plt.show()
+
+
+Análisis 5.2: La cantidad de componentes afecta directamente la calidad de reconstrucción visual. Con una varianza del 99%, la imagen conserva casi todos sus detalles originales utilizando una fracción de las características iniciales. Al reducir la varianza al 70%, la compresión es extrema (usando un ‭$k$‬ muy pequeño); la imagen reconstruida pierde detalles finos y nitidez facial, mostrando un efecto de bloques o desenfoque. Esto evidencia el costo estructural de sacrificar componentes principales.
+Actividad 2: Análisis (Air Quality id=360)
+¿El PCA fue útil en este dataset y se lograron patrones visibles?
+Sí, la aplicación del PCA fue sumamente útil. Los datos de calidad del aire dependen de sensores de óxidos metálicos altamente correlacionados entre sí (CO, NMHC, NOx). El análisis logra agrupar esta redundancia en componentes principales interpretables. Al observar la dispersión sobre el PC1, se identifican agrupaciones visibles que separan periodos del día con aire limpio (valores bajos en PC1) frente a momentos críticos de alta contaminación vinculados al tráfico, como la hora pico (valores altos en PC1 liderados por altas concentraciones de monóxido de carbono).
+
