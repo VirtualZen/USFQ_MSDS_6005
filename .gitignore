@@ -12,3 +12,14 @@ wheels/
 .DS_Store
 .venv.zip
 mlflow.db
+
+# Generated artifacts
+**/generated/
+
+# Lab04 generated outputs
+Lab04/equipos.csv
+Lab04/equipos.parquet
+Lab04/modelos/
+Lab04/Entregable/equipos.csv
+Lab04/Entregable/equipos.parquet
+Lab04/Entregable/modelos/
