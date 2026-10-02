@@ -25,10 +25,13 @@ from matplotlib import pyplot as plt   #Libreria que permite hacer plot
 from PIL import Image #Procesamiento Digital de IMágenes PIL: Python Image Library
 import numpy as np
 if not os.path.exists('lfwcrop_grey'):
+    from urllib.request import urlretrieve
+    from zipfile import ZipFile
 
-    !wget http://conradsanderson.id.au/lfwcrop/lfwcrop_grey.zip
-
-    !unzip 'lfwcrop_grey.zip'
+    archive_path = 'lfwcrop_grey.zip'
+    urlretrieve('http://conradsanderson.id.au/lfwcrop/lfwcrop_grey.zip', archive_path)
+    with ZipFile(archive_path) as archive:
+        archive.extractall()
 
 filenames = []
 images = []
@@ -308,7 +311,7 @@ Escoger un dataSet genérico de interés del repositorio proporcionado y aplicar
 """
 
 # Instalar
-!pip install -q ucimlrepo
+# Install ucimlrepo in the selected environment before running this script.
 # Link: https://archive.ics.uci.edu/dataset/360/air+quality
 # PCA puro sobre features de Air Quality (UCI id=360)
 import numpy as np
