@@ -85,7 +85,7 @@ La nube se ve concentrada en la zona derecha/arriba: la mayoría de canciones ac
 
 # @title
 # Instalar
-!pip install -q ucimlrepo
+# Install ucimlrepo in the selected environment before running this script.
 # Link: https://archive.ics.uci.edu/dataset/186/wine+quality
 # PCA puro sobre features de Wine Quality (UCI id=186)
 #Muestras: ~4900 vinos portugueses (tintos y blancos).
